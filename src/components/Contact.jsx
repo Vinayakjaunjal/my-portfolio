@@ -1,7 +1,41 @@
+import { useRef, useState } from "react";
+import emailjs from "@emailjs/browser";
+import toast from "react-hot-toast";
+
 function Contact() {
+  const form = useRef();
+  const [loading, setLoading] = useState(false);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert("Thank you for your message! I will get back to you soon.");
+    setLoading(true);
+
+    // Send message to you
+    emailjs
+      .sendForm(
+        "service_6gsnbmr",
+        "template_fkqjeq2",
+        form.current,
+        "KxGTZ_LnSYvuP-PG8",
+      )
+      .then(() => {
+        // Auto reply
+        emailjs.sendForm(
+          "service_6gsnbmr",
+          "template_wiaz0w8",
+          form.current,
+          "KxGTZ_LnSYvuP-PG8",
+        );
+
+        toast.success("Message Sent Successfully!");
+        form.current.reset();
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        toast.error("Failed to send message!");
+        setLoading(false);
+      });
   };
 
   return (
@@ -40,19 +74,38 @@ function Contact() {
             </div>
           </div>
 
-          <div className="contact-form-wrapper ">
-            <form className="contact-form" onSubmit={handleSubmit}>
+          <div className="contact-form-wrapper">
+            <form ref={form} className="contact-form" onSubmit={handleSubmit}>
               <div className="form-group">
-                <input type="text" placeholder="Your Name" required />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your Name"
+                  required
+                />
               </div>
+
               <div className="form-group">
-                <input type="email" placeholder="Your Email" required />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your Email"
+                  required
+                />
               </div>
+
               <div className="form-group">
-                <input type="text" placeholder="Subject" required />
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder="Subject"
+                  required
+                />
               </div>
+
               <div className="form-group">
                 <textarea
+                  name="message"
                   rows="5"
                   placeholder="Your Message"
                   required
